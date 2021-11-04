@@ -19,3 +19,11 @@ int main(int argc, char* argv[]) {
     return 0;
 
 }
+
+void fetchNextInstruction() {
+    // put individual fetching process in here
+}
+
+void executeInstruction() {
+    // put individual execution process in here
+}
