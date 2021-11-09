@@ -8,6 +8,7 @@ using namespace std;
 void fetchNextInstruction(void);
 void executeInstruction(void);
 void readFileIntoMem(unsigned char* memory);
+void writeToOutputFile(unsigned char* memory);
 
 unsigned char memory[65536];
 unsigned char ACC = 0;
@@ -23,6 +24,8 @@ int main(int argc, char* argv[]) {
         fetchNextInstruction();
         executeInstruction();
     }
+
+    writeToOutputFile(memory);
     return 0;
 
 }
@@ -44,7 +47,24 @@ void readFileIntoMem(unsigned char* memory) {
     memFile.close();
 }
 
+void writeToOutputFile(unsigned char* memory) {
+    ofstream oMemFile("mem_out.txt");
+    oMemFile.clear();
+    int i = 0;
+    while (memory[i] != HALT_OPCODE) {
+        if (i % 10 == 0 && i != 0) {
+            oMemFile << '\n';
+        }
+        oMemFile << memory[i] + ' ';
+        i++;
+    }
+
+    oMemFile.close();
+}
+
+
 void fetchNextInstruction() {
+    IR = memory[PC];
     
     // if math opcode
     if (false) {
@@ -58,13 +78,17 @@ void fetchNextInstruction() {
     }
     // if branch opcode
     // Chris's stuff
-    /* else if (stuff) {
-
+    else if ((IR & 0xF8) == 0x10) {
+        PC += 3;
     } 
     // if special opcode
     else {
-
-    }*/
+        // no opcode condition
+        if (IR == 0x18) {
+            PC++;
+        }
+        // halt opcode requires no check
+    }
 
 }
 
@@ -82,11 +106,37 @@ void executeInstruction() {
     }
     // if branch opcode
     // Chris's stuff
-    /* else if (stuff) {
-
+    else if ((IR & 0xF8) == 0x10) {
+        switch ((IR & 0x07))
+        {
+        case 0x00:
+            // obtains a 16 bit address and stores in PC
+            PC = (memory[PC - 2] << 8) + memory[PC - 1];
+            break;
+        case 0x01:
+            PC = ACC == 0 ? (memory[PC - 2] << 8) + memory[PC - 1] : PC;
+            break;
+        case 0x02:
+            PC = ACC != 0 ? (memory[PC - 2] << 8) + memory[PC - 1] : PC;
+            break;
+        case 0x03:
+            PC = ACC < 0 ? (memory[PC - 2] << 8) + memory[PC - 1] : PC;
+            break;
+        case 0x04:
+            PC = ACC <= 0 ? (memory[PC - 2] << 8) + memory[PC - 1] : PC;
+            break;
+        case 0x05:
+            PC = ACC > 0 ? (memory[PC - 2] << 8) + memory[PC - 1] : PC;
+            break;
+        case 0x06:
+            PC = ACC >= 0 ? (memory[PC - 2] << 8) + memory[PC - 1] : PC;
+            break;        
+        default:
+            break;
+        }
     }
     // if special opcode
     else {
-
-    } */
+        // do nothing
+    }
 }
