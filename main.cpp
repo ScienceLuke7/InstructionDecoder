@@ -64,6 +64,7 @@ void writeToOutputFile(unsigned char* memory) {
 
 
 void fetchNextInstruction() {
+    // stores the current instruction into the Instruction Register (IR)
     IR = memory[PC];
     
     // if math opcode
@@ -71,19 +72,43 @@ void fetchNextInstruction() {
     // put math fetching process in here
 
     }
-    // if memory opcode
-    else if (false) {
-    // put memory fetching process in here
+    // check if memory op
+    // opcode   operand     operand
+    // 0000_1110
+    // 0x0E     0x56        0x75
+    else if ((IR & 0xF0) == 0x00) {
+        // check if store op
+        if ((IR & 0x08) == 0x0) {
+            // add check for ACC and else for MAR
+            // if ACC then check if the method is an operand address or MAR pointer
+            // add 3 to PC if method is operand address, otherwise MAR pointer mean add 1 to PC
+            PC += 3; PC++;
+            // else for MAR will always increase PC by 3
+        }
+        // check if load op
+        else {
+            // add check again for load into ACC and else for MAR
+            // add if, else if, else check for if method if an address, constant, or MAR pointer
+            // by address increments PC by 2, constant increments PC by 2, and MAR pointer increases PC by 1
+
+            // else load into MAR
+            // add again the if, else if, else checks for the method types
+            // since loading into MAR, by address method increments PC by 3, constant increments PC by 3,
+            // and MAR pointer increases PC by 1
+            
+        }
+
+
 
     }
-    // if branch opcode
-    // Chris's stuff
+    // if branch opcode; applies a bitmask to see if opcode is a valid branch opcode (00010 aka 0x10)
     else if ((IR & 0xF8) == 0x10) {
+        // increments PC to skip over the branch operands to the next instruction
         PC += 3;
     } 
     // if special opcode
     else {
-        // no opcode condition
+        // no opcode condition; stated by project specifications to increment PC by 1 if opcode is 0001_1000 (0x18)
         if (IR == 0x18) {
             PC++;
         }
@@ -99,14 +124,50 @@ void executeInstruction() {
     // put math execution process in here
 
     }
-    // if memory opcode
-    else if (false) {
-    // put memory execution process in here
+    // check is memory op
+    else if ((IR & 0xF0) == 0x00) {
+        // check if store op; IMPORTANT: storing goes from ACC or MAR -> memory
+        if ((IR & 0x08) == 0x0) {
+            // if (ACC opcode) for storing
+            // if ACC opode, if, else if, else for operand address, constant operand, or MAR pointer; like in fetch.
+            // To store into memory for operand address we do something like below, where
+            // "(memory[PC - 2] << 8) + memory[PC-1]" is the address of memory being stored to given by operands
+            memory[(memory[PC - 2] << 8) + memory[PC - 1]] = ACC;
+            // NOTE: I don't think storing for constant operand makes sense so just make empty else if for that
+            // for MAR pointer, use MAR as pointer into memory and store ACC there
+
+            // if (MAR opcode) for storing
+            // use if, else if, else for operand address, constant operand, or MAR pointer
+            // constant operand and MAR pointer make no sense here so do empty if blocks
+            // for operand address however, I think it goes something like below
+            // "(MAR & 0xFF00) >> 8" means it takes the MAR 16-bit data and converts to 8-bit to fit into memory
+            memory[(memory[PC - 2] << 8) + memory[PC - 1]] = (MAR & 0xFF00) >> 8;
+
+        }
+        // else it is load op
+        else {
+            // again, if, else if, else for the 3 method types
+            // reverse of store really
+
+            // if ACC is destination and method is operand address
+            ACC = memory[(memory[PC - 2] << 8) + memory[PC - 1]];
+            // if ACC is destination and method is constant
+            ACC = memory[PC - 1];
+            // assume ACC is destination and method is MAR
+            ACC = memory[MAR];
+
+            // do like above for if loading into MAR
+            // loading into MAR with operand address is tricky, but I think this is it
+            MAR = (memory[(memory[PC - 2] << 8) + memory[PC - 1]]) << 8;
+            MAR += (memory[(memory[PC - 2] << 8) + memory[PC - 1] + 1]);
+
+
+        }
 
     }
-    // if branch opcode
-    // Chris's stuff
+    // if branch opcode; applies same branching bitmask here to see if opcode is a valid branch opcode (00010 aka 0x10)
     else if ((IR & 0xF8) == 0x10) {
+        // determines which branching should occur based on the last three bits of the opcode (0000_0111 aka 0x07)
         switch ((IR & 0x07))
         {
         case 0x00:
