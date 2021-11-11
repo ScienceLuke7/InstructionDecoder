@@ -120,8 +120,168 @@ void fetchNextInstruction() {
 void executeInstruction() {
 
     // if math opcode
-    if (false) {
+    if ((IR & 0x80) == 0x80) {
     // put math execution process in here
+        int opertion;
+        int src;
+        string dest;
+        int mathVar;
+        int nextByte = 1;
+        
+       //finding the destintion
+        switch (IR & 0x0C)
+        {
+        case 0x00:
+            /* indirect */
+            dest = "IND";
+            mathVar = memory[MAR];
+            break;
+        case 0x01:
+            /* Accumulator */
+            dest = "ACC";
+            mathVar = ACC;
+            break;
+        case 0x02:
+            /* Register MAR */
+            dest = "MAR";
+            mathVar = MAR;
+            break;
+        case 0x03:
+            /* memory */
+            dest = "MEM";
+            mathVar = memory[PC + nextByte];
+            nextByte++;
+            break;
+        
+        default:
+            break;
+        }
+     //finding the src
+        switch (IR & 0x03)
+        {
+        case 0x00:
+            /* indirect */
+            src = memory[MAR];
+            break;
+        case 0x01:
+            /* Accumulator */
+            src = ACC;
+            break;
+        case 0x02:
+            /* Constant */
+            src = memory[PC + nextByte];
+            break;
+        case 0x03:
+            /* Memory */
+            src = memory[memory[PC + nextByte]];
+            break;
+        
+        default:
+            break;
+        }
+
+
+        switch ((IR & 0x70))
+        {
+        case 0x00:
+            /* AND */
+            if (dest == "IND"){
+                memory[MAR] = src & mathVar;
+            }else if (dest == "ACC") {
+                ACC = src & mathVar;
+            }else if (dest == "MAR"){
+                MAR = src & mathVar;
+            }else if (dest == "MEM"){
+                memory[PC] = src & mathVar;
+            }
+            break;
+        case 0x10:
+            /* OR */
+            if (dest == "IND"){
+                memory[MAR] = src | mathVar;
+            }else if (dest == "ACC") {
+                ACC = src | mathVar;
+            }else if (dest == "MAR"){
+                MAR = src | mathVar;
+            }else if (dest == "MEM"){
+                memory[PC] = src | mathVar;
+            }
+            break;
+        case 0x20:
+            /* XOR */
+             if (dest == "IND"){
+                memory[MAR] = src ^ mathVar;
+            }else if (dest == "ACC") {
+                ACC = src ^ mathVar;
+            }else if (dest == "MAR"){
+                MAR = src ^ mathVar;
+            }else if (dest == "MEM"){
+                memory[PC] = src ^ mathVar;
+            }
+            break;
+        case 0x30:
+            /* ADD */
+             if (dest == "IND"){
+                memory[MAR] = src + mathVar;
+            }else if (dest == "ACC") {
+                ACC = src + mathVar;
+            }else if (dest == "MAR"){
+                MAR = src + mathVar;
+            }else if (dest == "MEM"){
+                memory[PC] = src + mathVar;
+            }
+            break;
+        case 0x40:
+            /* SUB */
+             if (dest == "IND"){
+                memory[MAR] = src - mathVar;
+            }else if (dest == "ACC") {
+                ACC = src - mathVar;
+            }else if (dest == "MAR"){
+                MAR = src - mathVar;
+            }else if (dest == "MEM"){
+                memory[PC] = src - mathVar;
+            }
+            break;
+        case 0x50:
+            /* INC */
+             if (dest == "IND"){
+                memory[MAR] = src++;
+            }else if (dest == "ACC") {
+                ACC = src++;
+            }else if (dest == "MAR"){
+                MAR = src++;
+            }else if (dest == "MEM"){
+                memory[PC] = src++;
+            }
+            break;
+        case 0x60:
+            /* DEC */
+            if (dest == "IND"){
+                memory[MAR] = src--;
+            }else if (dest == "ACC") {
+                ACC = src--;
+            }else if (dest == "MAR"){
+                MAR = src--;
+            }else if (dest == "MEM"){
+                memory[PC] = src--;
+            }
+            break;
+        case 0x70:
+            /* NOT */
+            if (dest == "IND"){
+                memory[MAR] = ~src;
+            }else if (dest == "ACC") {
+                ACC = ~src;
+            }else if (dest == "MAR"){
+                MAR = ~src;
+            }else if (dest == "MEM"){
+                memory[PC] = ~src;
+            }
+            break;    
+        default:
+            break;
+        }
 
     }
     // check is memory op
