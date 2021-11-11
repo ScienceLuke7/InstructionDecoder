@@ -68,9 +68,9 @@ void fetchNextInstruction() {
     IR = memory[PC];
     
     // if math opcode
-    if (false) {
+    if ((IR & 0x80) == 0x80) {
     // put math fetching process in here
-
+        PC++;
     }
     // check if memory op
     // opcode   operand     operand
@@ -106,7 +106,7 @@ void fetchNextInstruction() {
         // increments PC to skip over the branch operands to the next instruction
         PC += 3;
     } 
-    // if special opcode
+    // if special opcodez
     else {
         // no opcode condition; stated by project specifications to increment PC by 1 if opcode is 0001_1000 (0x18)
         if (IR == 0x18) {
