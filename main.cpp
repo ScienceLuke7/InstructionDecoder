@@ -126,7 +126,7 @@ void fetchNextInstruction() {
         // increments PC to skip over the branch operands to the next instruction
         PC += 3;
     } 
-    // if special opcodez
+    // if special opcode
     else {
         // no opcode condition; stated by project specifications to increment PC by 1 if opcode is 0001_1000 (0x18)
         if (IR == 0x18) {
@@ -138,10 +138,6 @@ void fetchNextInstruction() {
 }
 
 void executeInstruction() {
-
-    //memory ops vars
-    string valMethod;
-    string memTracker;
     // if math opcode
     if ((IR & 0x80) == 0x80) {
     // put math execution process in here
@@ -309,7 +305,10 @@ void executeInstruction() {
     }
     // check is memory op
     else if ((IR & 0xF0) == 0x00) {
-
+        //memory ops vars
+        string valMethod;
+        string memTracker;
+        
         switch ((IR & 0x0F)) 
         {
         case 0x00:
